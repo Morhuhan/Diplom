@@ -24,7 +24,22 @@ AppDataSource.initialize()
 
 // Регистрация с хешированием пароля
 app.post('/register', async (req: Request, res: Response) => {
-  // ваш код
+  try {
+    const { username, password, role } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User();
+    user.username = username;
+    user.password = hashedPassword;
+    user.role = role;
+
+    await AppDataSource.manager.save(user);
+
+    res.status(201).send('Пользователь зарегистрирован');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Ошибка сервера');
+  }
 });
 
 // Вход
